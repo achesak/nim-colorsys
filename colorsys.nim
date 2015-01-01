@@ -1,15 +1,8 @@
-# Nimrod module for converting between color systems.
+# Nim module for converting between color systems.
 # Ported from the colorsys module in the Python standard library.
 
 # Written by Adam Chesak.
 # Released under the MIT open source license.
-
-
-
-
-
-# ALSO ADD IN SUPPORT TO CONSTRUCT COLORS FROM EACH TYPE (EXCLUDING RBG). SEE THE colors
-# MODULE FOR HOW THIS WOULD WORK (rgb())
 
 
 import math

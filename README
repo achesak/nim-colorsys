@@ -1,6 +1,6 @@
 ---- About ----
 
-nimrod-colorsys is a Nimrod module for converting between the RGB, YIQ, HLS, and HSV color systems. It is a port of the colorsys module in the Python standard library.
+nim-colorsys is a Nim module for converting between the RGB, YIQ, HLS, and HSV color systems. It is a port of the colorsys module in the Python standard library.
 
 All coordinates used are floats, between 0 and 1 (the exception being I and Q in the YIQ color space, which can be positive or negative).
 
@@ -8,4 +8,4 @@ See the documentation.html file for usage and more info.
 
 ---- License ----
 
-nimrod-colorsys is released under the MIT open source license.
+nim-colorsys is released under the MIT open source license.
