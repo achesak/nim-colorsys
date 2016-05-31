@@ -5,15 +5,46 @@
 # Released under the MIT open source license.
 
 
+## nim-colorsys is a Nim module for converting between the RGB, YIQ, HLS, and HSV color systems.
+## It is a port of the ``colorsys`` module in the Python standard library.
+##
+## All coordinates used are floats between 0 and 1 (the exception being I and Q in the YIQ color space,
+## which can be positive or negative).
+##
+## Example: 
+##
+## .. code-block:: nim
+##
+##    # Gold color
+##    var rgb : seq[float] = @[1.00, 0.84, 0.00]
+##    
+##    # Convert to other color systems.
+##    var yiq : seq[float] = rgbToYiq(rgb)
+##    var hls : seq[float] = rgbToHls(rgb)
+##    var hsv : seq[float] = rgbToHsv(rgb)
+##    
+##    # Output the color in each system.
+##    echo("RGB: " & $rgb) # outputs "RGB: @[1.0, 0.84, 0.0]"
+##    echo("YIQ: " & $yiq) # outputs "YIQ: @[0.7955999999999999, 0.3648, -0.2268]"
+##    echo("HLS: " & $hls) # outputs "HLS: @[0.14, 0.5, 1.0]"
+##    echo("HSV: " & $hsv) # outputs "HSV: @[0.14, 1.0, 1.0]"
+##
+## Example based on Python ``colorsys`` example at http://effbot.org/librarybook/colorsys.htm.
+
+
 import math
 
 
-proc rgbToYiq*(r : float, g : float, b : float): seq[float] =
+proc rgbToYiq*(rgb : seq[float]): seq[float] =
     ## Converts from RGB to YIQ.
     ##
     ## YIQ: used by composite video signals (linear combinations of RGB)
     ## - Y: perceived grey level (0.0 == black, 1.0 == white)
     ## - I, Q: color components
+    
+    var r : float = rgb[0]
+    var g : float = rgb[1]
+    var b : float = rgb[2]
     
     var yiq = newSeq[float](3)
     yiq[0] = (0.30 * r) + (0.59 * g) + (0.11 * b)
@@ -22,8 +53,12 @@ proc rgbToYiq*(r : float, g : float, b : float): seq[float] =
     return yiq
 
 
-proc yiqToRgb*(y : float, i : float, q : float): seq[float] = 
+proc yiqToRgb*(yiq : seq[float]): seq[float] = 
     ## Converts from YIQ to RBG.
+    
+    var y : float = yiq[0]
+    var i : float = yiq[1]
+    var q : float = yiq[2]
     
     var rgb = newSeq[float](3)
     rgb[0] = y + (0.948262 * i) + (0.624013 * q)
@@ -44,13 +79,17 @@ proc yiqToRgb*(y : float, i : float, q : float): seq[float] =
     return rgb
 
 
-proc rgbToHls*(r : float, g : float, b : float): seq[float] = 
+proc rgbToHls*(rgb : seq[float]): seq[float] = 
     ## Converts from RGB to HLS.
     ##
     ## HLS: Hue, Luminance, Saturation
     ## - H: position in the spectrum
     ## - L: color lightness
     ## - S: color saturation
+    
+    var r : float = rgb[0]
+    var g : float = rgb[1]
+    var b : float = rgb[2]
     
     var maxc : float = max(r, g, b)
     var minc : float = min(r, g, b)
@@ -89,8 +128,12 @@ proc hlsHelper(m1 : float, m2 : float, hue : float): float =
     return m1
 
 
-proc hlsToRgb*(h : float, l : float, s : float): seq[float] = 
+proc hlsToRgb*(hls : seq[float]): seq[float] = 
     ## Converts from HLS to RGB.
+    
+    var h : float = hls[0]
+    var l : float = hls[1]
+    var s : float = hls[2]
     
     if s == 0.0:
         return @[l, l, l]
@@ -104,13 +147,17 @@ proc hlsToRgb*(h : float, l : float, s : float): seq[float] =
     return @[hlsHelper(m1, m2, (h + (1.0 / 3.0))), hlsHelper(m1, m2, h), hlsHelper(m1, m2, (h - (1.0 / 3.0)))]
 
 
-proc rgbToHsv*(r : float, g : float, b : float): seq[float] = 
+proc rgbToHsv*(rgb : seq[float]): seq[float] = 
     ## Converts from RGB to HSV.
     ##
     # HSV: Hue, Saturation, Value
     ## - H: position in the spectrum
     ## - S: color saturation ("purity")
     ## - V: color brightness
+    
+    var r : float = rgb[0]
+    var g : float = rgb[1]
+    var b : float = rgb[2]
     
     var maxc : float = max(r, g, b)
     var minc : float = min(r, g, b)
@@ -132,8 +179,12 @@ proc rgbToHsv*(r : float, g : float, b : float): seq[float] =
     return @[h, s, v]
 
 
-proc hsvToRgb*(h : float, s : float, v : float): seq[float] = 
+proc hsvToRgb*(hsv : seq[float]): seq[float] = 
     ## Converts from HSV to RGB.
+    
+    var h : float = hsv[0]
+    var s : float = hsv[1]
+    var v : float = hsv[2]
     
     if s == 0.0:
         return @[v, v, v]
