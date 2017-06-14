@@ -11,18 +11,18 @@
 ## All coordinates used are floats between 0 and 1 (the exception being I and Q in the YIQ color space,
 ## which can be positive or negative).
 ##
-## Example: 
+## Example:
 ##
 ## .. code-block:: nim
 ##
 ##    # Gold color
 ##    var rgb : seq[float] = @[1.00, 0.84, 0.00]
-##    
+##
 ##    # Convert to other color systems.
 ##    var yiq : seq[float] = rgbToYiq(rgb)
 ##    var hls : seq[float] = rgbToHls(rgb)
 ##    var hsv : seq[float] = rgbToHsv(rgb)
-##    
+##
 ##    # Output the color in each system.
 ##    echo("RGB: " & $rgb) # outputs "RGB: @[1.0, 0.84, 0.0]"
 ##    echo("YIQ: " & $yiq) # outputs "YIQ: @[0.7955999999999999, 0.3648, -0.2268]"
@@ -34,6 +34,7 @@
 
 import math
 
+{.push warning[SmallLshouldNotBeUsed]: off.}
 
 proc rgbToYiq*(rgb : seq[float]): seq[float] =
     ## Converts from RGB to YIQ.
@@ -41,11 +42,11 @@ proc rgbToYiq*(rgb : seq[float]): seq[float] =
     ## YIQ: used by composite video signals (linear combinations of RGB)
     ## - Y: perceived grey level (0.0 == black, 1.0 == white)
     ## - I, Q: color components
-    
+
     var r : float = rgb[0]
     var g : float = rgb[1]
     var b : float = rgb[2]
-    
+
     var yiq = newSeq[float](3)
     yiq[0] = (0.30 * r) + (0.59 * g) + (0.11 * b)
     yiq[1] = (0.60 * r) - (0.28 * g) - (0.32 * b)
@@ -53,13 +54,13 @@ proc rgbToYiq*(rgb : seq[float]): seq[float] =
     return yiq
 
 
-proc yiqToRgb*(yiq : seq[float]): seq[float] = 
+proc yiqToRgb*(yiq : seq[float]): seq[float] =
     ## Converts from YIQ to RBG.
-    
+
     var y : float = yiq[0]
     var i : float = yiq[1]
     var q : float = yiq[2]
-    
+
     var rgb = newSeq[float](3)
     rgb[0] = y + (0.948262 * i) + (0.624013 * q)
     rgb[1] = y - (0.276066 * i) - (0.639810 * q)
@@ -79,20 +80,20 @@ proc yiqToRgb*(yiq : seq[float]): seq[float] =
     return rgb
 
 
-proc rgbToHls*(rgb : seq[float]): seq[float] = 
+proc rgbToHls*(rgb : seq[float]): seq[float] =
     ## Converts from RGB to HLS.
     ##
     ## HLS: Hue, Luminance, Saturation
     ## - H: position in the spectrum
     ## - L: color lightness
     ## - S: color saturation
-    
+
     var r : float = rgb[0]
     var g : float = rgb[1]
     var b : float = rgb[2]
-    
-    var maxc : float = max(r, g, b)
-    var minc : float = min(r, g, b)
+
+    var maxc : float = max(r, max(g, b))
+    var minc : float = min(r, min(g, b))
     var l : float = (minc + maxc) / 2.0
     if minc == maxc:
         return @[0.0, l, 0.0]
@@ -113,11 +114,11 @@ proc rgbToHls*(rgb : seq[float]): seq[float] =
         h = 4.0 + gc - rc
     h = (h / 6.0) mod 1.0
     return @[h, l, s]
-    
 
-proc hlsHelper(m1 : float, m2 : float, hue : float): float = 
+
+proc hlsHelper(m1 : float, m2 : float, hue : float): float =
     ## Helper for hlsToRgb().
-    
+
     var hue2 : float = hue mod 1.0
     if hue2 < (1.0 / 6.0):
         return m1 + ((m2 - m1) * hue2 * 6.0)
@@ -128,13 +129,13 @@ proc hlsHelper(m1 : float, m2 : float, hue : float): float =
     return m1
 
 
-proc hlsToRgb*(hls : seq[float]): seq[float] = 
+proc hlsToRgb*(hls : seq[float]): seq[float] =
     ## Converts from HLS to RGB.
-    
+
     var h : float = hls[0]
     var l : float = hls[1]
     var s : float = hls[2]
-    
+
     if s == 0.0:
         return @[l, l, l]
     var m1 : float
@@ -147,20 +148,20 @@ proc hlsToRgb*(hls : seq[float]): seq[float] =
     return @[hlsHelper(m1, m2, (h + (1.0 / 3.0))), hlsHelper(m1, m2, h), hlsHelper(m1, m2, (h - (1.0 / 3.0)))]
 
 
-proc rgbToHsv*(rgb : seq[float]): seq[float] = 
+proc rgbToHsv*(rgb : seq[float]): seq[float] =
     ## Converts from RGB to HSV.
     ##
     # HSV: Hue, Saturation, Value
     ## - H: position in the spectrum
     ## - S: color saturation ("purity")
     ## - V: color brightness
-    
+
     var r : float = rgb[0]
     var g : float = rgb[1]
     var b : float = rgb[2]
-    
-    var maxc : float = max(r, g, b)
-    var minc : float = min(r, g, b)
+
+    var maxc : float = max(r, max(g, b))
+    var minc : float = min(r, min(g, b))
     var v : float = maxc
     if minc == maxc:
         return @[0.0, 0.0, v]
@@ -179,13 +180,13 @@ proc rgbToHsv*(rgb : seq[float]): seq[float] =
     return @[h, s, v]
 
 
-proc hsvToRgb*(hsv : seq[float]): seq[float] = 
+proc hsvToRgb*(hsv : seq[float]): seq[float] =
     ## Converts from HSV to RGB.
-    
+
     var h : float = hsv[0]
     var s : float = hsv[1]
     var v : float = hsv[2]
-    
+
     if s == 0.0:
         return @[v, v, v]
     var i : int = int(h * 6.0)
